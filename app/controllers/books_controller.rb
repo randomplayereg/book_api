@@ -1,5 +1,6 @@
-class BooksController < ApplicationController
-  before_action :set_book, only: [:show, :update, :destroy]
+class BooksController < ApiController
+  before_action :set_book, only: [:show, :require_login]
+  before_action :require_login, only: [:update, :destroy]
 
   # GET /books
   def index
