@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_secure_token
-  has_many :books
+  has_many :books, dependent: :destroy
 
   def self.valid_login?(email, password)
     user = User.find_by(email: email)

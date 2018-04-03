@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
   resources :users
+
+  get "/users/:id/check_admin", to: "users#check_admin"
+
   resources :books
 
   post "/newsession", to: "sessions#create"

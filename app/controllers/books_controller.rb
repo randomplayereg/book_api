@@ -1,10 +1,13 @@
 class BooksController < ApiController
-  before_action :set_book, only: [:show, :require_login]
-  before_action :require_login, only: [:update, :destroy, :create]
+  # before_action :set_book, only: [:show, :update, :destroy]
+  before_action :set_book, except: [:index, :create]
+  before_action :require_login, only: [:update, :destroy, :require_either_admin_or_same_user]
+  before_action :require_either_admin_or_same_user, only: [:update, :destroy]
 
   # GET /books
   def index
-    #debugger
+    params.permit(:filter_by_id, :filter_by_keyword)
+
     if params[:filter_by_id]
       @books = Book.where(user_id: params[:filter_by_id]);
     elsif params[:filter_by_keyword]
@@ -16,13 +19,16 @@ class BooksController < ApiController
   end
   # GET /books/1
   def show
+
     render json: @book, status: :ok#, serializer: BookSerialize
     # render json: @book,  fields: { books: [:title, :author, user: [:email, :username]] }
   end
 
   # POST /books
   def create
+
     @book = Book.new(book_params)
+    @book.user_id = current_user.id
 
     if @book.save
       render json: @book, status: :created, location: @book
@@ -33,6 +39,7 @@ class BooksController < ApiController
 
   # PATCH/PUT /books/1
   def update
+
     if @book.update(book_params)
       render json: @book, status: :ok
     else
@@ -55,7 +62,13 @@ class BooksController < ApiController
 
     # Only allow a trusted parameter "white list" through.
     def book_params
-      params.require(:book).permit(:title, :author, :user_id)
-      params.permit(:filter_by_id, :filter_by_keyword)
+      params.require(:book).permit(:title, :author)
+    end
+
+    def require_either_admin_or_same_user
+      debugger
+      if @book.user_id != current_user.id && current_user.admin == false
+        render_unauthorized("Access denied!")
+      end
     end
 end
