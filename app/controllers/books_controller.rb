@@ -1,12 +1,18 @@
 class BooksController < ApiController
   before_action :set_book, only: [:show, :require_login]
-  before_action :require_login, only: [:update, :destroy]
+  before_action :require_login, only: [:update, :destroy, :create]
 
   # GET /books
   def index
-    @books = Book.all
-    render json: @books, status: :ok#, each_serializer: BookSerializer
+    #debugger
+    if params[:filter_by_id]
+      @books = Book.where(user_id: params[:filter_by_id]);
+    elsif params[:filter_by_keyword]
 
+    else
+      @books = Book.all
+    end
+    render json: @books, status: :ok
   end
   # GET /books/1
   def show
@@ -50,5 +56,6 @@ class BooksController < ApiController
     # Only allow a trusted parameter "white list" through.
     def book_params
       params.require(:book).permit(:title, :author, :user_id)
+      params.permit(:filter_by_id, :filter_by_keyword)
     end
 end

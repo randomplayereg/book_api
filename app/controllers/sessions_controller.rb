@@ -1,30 +1,22 @@
 class SessionsController < ApiController
-  skip_before_action :require_login, only: [:create], raise: false
+  #skip_before_action :require_login, only: [:create], raise: false
+  before_action :require_login, only: [:destroy]
   def create
-    debugger
     if user = User.valid_login?(params[:email], params[:password])
-      renew_token(user)
-      send_token(user)
+      user.renew_token
+      send_token_and_user_id(user)
     else
       render_unauthorized("Invalid email or password!")
     end
   end
 
   def destroy
-
+    current_user.logout
     head :ok
   end
 
   private
-    def renew_token(user)
-      user.regenerate_token
-    end
-
-    def send_token(user)
-      render json: { token: user.token }
-    end
-
-    def logout
-      current_user.invalidate_token
+    def send_token_and_user_id(user)
+      render json: { token: user.token, user_id: user.id, username: user.username }
     end
 end
