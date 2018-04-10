@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :users
 
   get "/users/:id/check_admin", to: "users#check_admin"
+  get "/books/total", to: "books#total"
 
   resources :books
 

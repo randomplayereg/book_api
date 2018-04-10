@@ -9,7 +9,7 @@
 User.destroy_all
 
 User.create(username: "admin", email: "admin@imug.com", password: "1", admin: true)
-6.times do
+10.times do
   username = Faker::Internet.unique.user_name(5..10)
   email = Faker::Internet.unique.email
   password = "1"

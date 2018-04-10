@@ -2,7 +2,7 @@ class SessionsController < ApiController
   #skip_before_action :require_login, only: [:create], raise: false
   before_action :require_login, only: [:destroy]
   def create
-    if user = User.valid_login?(params[:email], params[:password])
+    if user = User.valid_login?(params[:email].downcase, params[:password])
       user.renew_token
       send_token_and_user_id(user)
     else
